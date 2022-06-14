@@ -3,8 +3,19 @@ export interface ClientResponse {
   data: ClientData[];
 }
 
+interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 export interface ClientData {
   id: string;
   name: string;
-  // employees, zones, machines
+}
+
+export interface SingleClientData extends ClientData {
+  employees: Employee[];
+  // TODO employees, zones, machines
 }

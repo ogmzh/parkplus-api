@@ -7,12 +7,17 @@ import {
   Post,
   Put,
   UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
-import { ApiValidationPipe } from '../shared/pipes/apiValidation.pipe';
+import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
+import { ClientUserData } from '@app/clientUser/interfaces/clientUser.response';
+import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
 import { ClientService } from './client.service';
 import { ClientDto } from './interfaces/client.dto';
-import { ClientData, ClientResponse } from './interfaces/client.response';
+import {
+  ClientData,
+  ClientResponse,
+  SingleClientData,
+} from './interfaces/client.response';
 
 @Controller('clients')
 export class ClientController {
@@ -44,5 +49,22 @@ export class ClientController {
   @UsePipes(new ApiValidationPipe())
   async deleteClient(@Param('id') clientId: string): Promise<void> {
     return await this.clientService.deleteClient(clientId);
+  }
+
+  @Post(':id')
+  @UsePipes(new ApiValidationPipe())
+  async createClientUser(
+    @Body('clientUser') dto: ClientUserDto,
+    @Param('id') clientId: string,
+  ): Promise<ClientUserData> {
+    return this.clientService.addUserToClient(dto, clientId);
+  }
+
+  @Get(':id')
+  @UsePipes(new ApiValidationPipe())
+  async getClientById(
+    @Param('id') clientId: string,
+  ): Promise<SingleClientData> {
+    return this.clientService.getById(clientId);
   }
 }

@@ -1,5 +1,6 @@
 import {
   ArgumentMetadata,
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -12,6 +13,9 @@ import { isValidUUID } from '../utils/utils';
 @Injectable()
 export class ApiValidationPipe implements PipeTransform {
   async transform(value: any, { metatype, data, type }: ArgumentMetadata) {
+    if (!value) {
+      throw new BadRequestException();
+    }
     if (data === 'id' && type === 'param' && !isValidUUID(value)) {
       throw new HttpException({ errors: `invalid UUID` }, HttpStatus.NOT_FOUND);
     }
@@ -21,7 +25,6 @@ export class ApiValidationPipe implements PipeTransform {
     const object = plainToClass(metatype, value);
     const errors = await validate(object);
     if (errors.length === 0) {
-      console.log('returning value', value);
       return value;
     }
     throw new HttpException(

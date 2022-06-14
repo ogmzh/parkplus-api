@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { ClientEntity } from '@app/client/client.entity';
 
@@ -18,10 +19,10 @@ export class ClientUserEntity {
   @Column({ name: 'last_name' })
   lastName: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @ManyToOne(() => ClientEntity, employee => employee.employees)
-  @JoinColumn({ name: 'employee_id' })
-  employee: ClientEntity;
+  @JoinColumn({ name: 'employer_id' })
+  employer: ClientEntity;
 }

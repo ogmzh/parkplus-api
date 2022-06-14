@@ -8,10 +8,10 @@ export class ClientEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
-  @OneToMany(() => ClientUserEntity, user => user.employee)
+  @OneToMany(() => ClientUserEntity, user => user.employer)
   employees: ClientUserEntity[];
 
   @OneToMany(() => ZoneEntity, zone => zone.client)

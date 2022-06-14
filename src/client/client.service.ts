@@ -1,18 +1,14 @@
 import { ClientUserEntity } from '@app/clientUser/clientUser.entity';
-import {
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ExistingResourceException } from '../shared/errors/existingResource.exception';
-import { MissingResourceException } from '../shared/errors/missingResource.exception';
-import { isValidUUID } from '../shared/utils/utils';
+import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
+import { ClientUserData } from '@app/clientUser/interfaces/clientUser.response';
+import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { ClientEntity } from './client.entity';
 import { ClientDto } from './interfaces/client.dto';
-import { ClientData } from './interfaces/client.response';
+import { ClientData, SingleClientData } from './interfaces/client.response';
 
 @Injectable()
 export class ClientService {
@@ -24,11 +20,11 @@ export class ClientService {
   ) {}
 
   async getAll(): Promise<{ count: number; data: ClientData[] }> {
-    const result = await this.clientRepository.findAndCount();
+    const [data, count] = await this.clientRepository.findAndCount();
 
     return {
-      data: result[0].map(entity => ({ id: entity.id, name: entity.name })),
-      count: result[1],
+      data: data.map(entity => ({ id: entity.id, name: entity.name })),
+      count,
     };
   }
 
@@ -52,8 +48,8 @@ export class ClientService {
       throw new MissingResourceException('id', id);
     }
     Object.assign(clientEntity, clientDto);
-    const updatedEntity = await this.clientRepository.save(clientEntity);
-    return { id: updatedEntity.id, name: updatedEntity.name };
+    await this.clientRepository.save(clientEntity);
+    return { id, name: clientDto.name };
   }
 
   async deleteClient(clientId: string): Promise<void> {
@@ -65,5 +61,61 @@ export class ClientService {
     }
     await this.clientRepository.delete({ id: clientId });
     return;
+  }
+
+  async addUserToClient(
+    dto: ClientUserDto,
+    clientId: string,
+  ): Promise<ClientUserData> {
+    const existingEmail =
+      (await this.clientUserRepository.countBy({
+        email: dto.email,
+      })) > 0;
+
+    if (existingEmail) {
+      throw new ExistingResourceException('email', dto.email);
+    }
+    const client = await this.clientRepository.findOne({
+      where: { id: clientId },
+      relations: ['employees'],
+    });
+    if (!client) {
+      throw new MissingResourceException(
+        'id',
+        clientId,
+        'could not find client',
+      );
+    }
+    const clientUser = new ClientUserEntity();
+    Object.assign(clientUser, dto);
+    clientUser.employer = client;
+    const entity = await this.clientUserRepository.save(clientUser);
+    return {
+      email: clientUser.email,
+      employer: { id: client.id, name: client.name },
+      firstName: clientUser.firstName,
+      lastName: clientUser.lastName,
+      id: entity.id,
+    };
+  }
+
+  async getById(clientId: string): Promise<SingleClientData> {
+    const client = await this.clientRepository.findOne({
+      where: { id: clientId },
+      relations: ['employees'],
+    });
+    if (!client) {
+      throw new MissingResourceException('id', clientId);
+    }
+    return {
+      id: client.id,
+      name: client.name,
+      employees: client.employees.map(employee => ({
+        id: employee.id,
+        email: employee.email,
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+      })),
+    };
   }
 }
