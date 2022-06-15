@@ -15,7 +15,7 @@ export class CityEntity {
   @Column()
   name: string;
 
-  @ManyToMany(() => AddressEntity)
+  @ManyToMany(() => AddressEntity, address => address.cities)
   @JoinTable({
     name: 'cities_addresses',
     joinColumn: { name: 'city_id', referencedColumnName: 'id' },

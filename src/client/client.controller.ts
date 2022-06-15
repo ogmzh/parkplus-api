@@ -51,7 +51,7 @@ export class ClientController {
     return await this.clientService.deleteClient(clientId);
   }
 
-  @Post(':id')
+  @Post(':id/users')
   @UsePipes(new ApiValidationPipe())
   async createClientUser(
     @Body('clientUser') dto: ClientUserDto,

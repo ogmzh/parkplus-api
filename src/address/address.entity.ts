@@ -1,11 +1,13 @@
+import { ZoneEntity } from '@app/zone/zone.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ZoneEntity } from '@app/zone/zone.entity';
+import { CityEntity } from '../city/city.entity';
 
 @Entity({ name: 'addresses' })
 export class AddressEntity {
@@ -21,4 +23,7 @@ export class AddressEntity {
   @ManyToOne(() => ZoneEntity, zone => zone.addresses)
   @JoinColumn({ name: 'zone_id' })
   zone: ZoneEntity;
+
+  @ManyToMany(() => CityEntity, city => city.addresses)
+  cities: CityEntity[];
 }
