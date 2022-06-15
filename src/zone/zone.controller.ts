@@ -1,6 +1,6 @@
 import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
 import { Body, Controller, Delete, Get, Put, UsePipes } from '@nestjs/common';
-import { UuidParam } from '../shared/decorators/uuid.param';
+import { UuidParam } from '@app/shared/decorators/uuid.param';
 import { ZoneDto } from './interfaces/zone.dto';
 import { ZoneEntry } from './interfaces/zone.response';
 import { ZoneService } from './zone.service';

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MissingResourceException } from '../shared/errors/missingResource.exception';
+import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { ZoneDto } from './interfaces/zone.dto';
 import { ZoneEntry } from './interfaces/zone.response';
 import { ZoneEntity } from './zone.entity';

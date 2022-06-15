@@ -6,17 +6,22 @@ import {
 } from '@nestjs/common';
 import { isValidUUID } from '@app/shared/utils/utils';
 
+// by default it will catch `:id` params. Can pass string to decorator that ends with `Id` (i.e. zoneId)
+// to check other ids as valid UUIDs
 export const UuidParam = createParamDecorator(
-  (_: any, ctx: ExecutionContext) => {
+  (data: any, ctx: ExecutionContext) => {
     const { params } = ctx.switchToHttp().getRequest();
-    if (!params.id) {
+    if (!data) {
+      if (params.id) {
+        return params.id;
+      }
       return null;
-    } else {
-      // must have path param `:id`
-      if (!isValidUUID(params.id)) {
+    } else if (Boolean(data) && String(data).endsWith('Id')) {
+      if (!isValidUUID(params[data])) {
         throw new HttpException(`Invalid UUID`, HttpStatus.BAD_REQUEST);
+      } else {
+        return params[data];
       }
     }
-    return params.id;
   },
 );

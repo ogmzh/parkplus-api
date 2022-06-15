@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Put,
-  UsePipes,
-} from '@nestjs/common';
 import { UuidParam } from '@app/shared/decorators/uuid.param';
 import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
+import { Body, Controller, Delete, Get, Put, UsePipes } from '@nestjs/common';
 import { ClientUserService } from './clientUser.service';
 import { ClientUserDto } from './interfaces/clientUser.dto';
 import { ClientUserEntry } from './interfaces/clientUser.response';
@@ -19,7 +11,7 @@ export class ClientUserController {
 
   @Get(':id')
   @UsePipes(new ApiValidationPipe())
-  async getById(@Param('id') id: string): Promise<ClientUserEntry> {
+  async getById(@UuidParam() id: string): Promise<ClientUserEntry> {
     return await this.clientUserService.getById(id);
   }
 
@@ -28,7 +20,7 @@ export class ClientUserController {
   @Put(':id')
   @UsePipes(new ApiValidationPipe())
   async updateUser(
-    @Param('id') id: string,
+    @UuidParam() id: string,
     @Body('clientUser') dto: ClientUserDto,
   ): Promise<ClientUserEntry> {
     return await this.clientUserService.update(id, dto);

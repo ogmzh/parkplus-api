@@ -1,22 +1,22 @@
+import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
+import { ClientUserEntry } from '@app/clientUser/interfaces/clientUser.response';
+import { UuidParam } from '@app/shared/decorators/uuid.param';
+import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
+import { ZoneDto } from '@app/zone/interfaces/zone.dto';
+import { ZoneEntry } from '@app/zone/interfaces/zone.response';
 import {
   Body,
   Controller,
   Delete,
   Get,
-  Param,
   Post,
   Put,
   UsePipes,
 } from '@nestjs/common';
-import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
-import { ClientUserEntry } from '@app/clientUser/interfaces/clientUser.response';
-import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
+import { ParkingMachineEntry } from '@app/parkingMachine/interfaces/parkingMachine.interface';
 import { ClientService } from './client.service';
 import { ClientDto } from './interfaces/client.dto';
 import { ClientEntry, ClientResponse } from './interfaces/client.response';
-import { UuidParam } from '@app/shared/decorators/uuid.param';
-import { ZoneDto } from '@app/zone/interfaces/zone.dto';
-import { ZoneEntry } from '@app/zone/interfaces/zone.response';
 
 @Controller('clients')
 export class ClientController {
@@ -39,14 +39,14 @@ export class ClientController {
   @UsePipes(new ApiValidationPipe())
   async updateClient(
     @Body('client') clientDto: ClientDto,
-    @Param('id') clientId: string,
+    @UuidParam() clientId: string,
   ): Promise<ClientEntry> {
     return await this.clientService.updateClient(clientId, clientDto);
   }
 
   @Delete(':id')
   @UsePipes(new ApiValidationPipe())
-  async deleteClient(@Param('id') clientId: string): Promise<void> {
+  async deleteClient(@UuidParam() clientId: string): Promise<void> {
     return await this.clientService.deleteClient(clientId);
   }
 
@@ -54,14 +54,14 @@ export class ClientController {
   @UsePipes(new ApiValidationPipe())
   async createClientUser(
     @Body('clientUser') dto: ClientUserDto,
-    @Param('id') clientId: string,
+    @UuidParam() clientId: string,
   ): Promise<ClientUserEntry> {
     return await this.clientService.addUserToClient(dto, clientId);
   }
 
   @Get(':id')
   @UsePipes(new ApiValidationPipe())
-  async getClientById(@Param('id') clientId: string): Promise<ClientEntry> {
+  async getClientById(@UuidParam() clientId: string): Promise<ClientEntry> {
     return await this.clientService.getById(clientId);
   }
 
@@ -72,5 +72,13 @@ export class ClientController {
     @Body('zone') dto: ZoneDto,
   ): Promise<ZoneEntry> {
     return await this.clientService.createZone(clientId, dto);
+  }
+
+  @Post(':id/zones/:zoneId/machines')
+  async createMachineInZone(
+    @UuidParam() clientId: string,
+    @UuidParam('zoneId') zoneId: string,
+  ): Promise<ParkingMachineEntry> {
+    return await this.clientService.createMachineInZone(clientId, zoneId);
   }
 }

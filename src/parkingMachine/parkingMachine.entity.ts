@@ -14,11 +14,17 @@ export class ParkingMachineEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => ZoneEntity, zone => zone.machines, { nullable: false })
+  @ManyToOne(() => ZoneEntity, zone => zone.machines, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'zone_id' })
   zone: ZoneEntity;
 
-  @ManyToOne(() => ClientEntity, client => client.machines, { nullable: false })
+  @ManyToOne(() => ClientEntity, client => client.machines, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 

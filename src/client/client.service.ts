@@ -1,5 +1,5 @@
 import { ClientUserEntity } from '@app/clientUser/clientUser.entity';
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
@@ -12,6 +12,8 @@ import { ClientEntry } from './interfaces/client.response';
 import { ZoneDto } from '@app/zone/interfaces/zone.dto';
 import { ZoneEntity } from '@app/zone/zone.entity';
 import { ZoneEntry } from '@app/zone/interfaces/zone.response';
+import { ParkingMachineEntry } from '../parkingMachine/interfaces/parkingMachine.interface';
+import { ParkingMachineEntity } from '../parkingMachine/parkingMachine.entity';
 
 @Injectable()
 export class ClientService {
@@ -20,6 +22,8 @@ export class ClientService {
     private readonly clientRepository: Repository<ClientEntity>,
     @InjectRepository(ClientUserEntity)
     private readonly clientUserRepository: Repository<ClientUserEntity>,
+    @InjectRepository(ParkingMachineEntity)
+    private readonly machineRepository: Repository<ParkingMachineEntity>,
     @InjectRepository(ZoneEntity)
     private readonly zoneRepository: Repository<ZoneEntity>,
   ) {}
@@ -153,6 +157,42 @@ export class ClientService {
       maxParkDuration: persisted.maxParkDuration,
       parkTimeStart: persisted.parkTimeStart,
       parkTimeEnd: persisted.parkTimeEnd,
+    };
+  }
+
+  async createMachineInZone(
+    clientId: string,
+    zoneId: string,
+  ): Promise<ParkingMachineEntry> {
+    const existingClient = await this.clientRepository.findOne({
+      where: {
+        id: clientId,
+      },
+      relations: ['zones'],
+    });
+    if (!existingClient) {
+      throw new MissingResourceException('clientId', clientId);
+    }
+    const existingZone = await this.zoneRepository.findOneBy({ id: zoneId });
+    if (!existingZone) {
+      throw new MissingResourceException('zoneId', zoneId);
+    }
+
+    if (!existingClient.zones.some(zone => zone.id === zoneId)) {
+      throw new HttpException(
+        "Can't create a machine in a zone which does not belong to the requested client.",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const machine = new ParkingMachineEntity();
+    machine.client = existingClient;
+    machine.zone = existingZone;
+    const entity = await this.machineRepository.save(machine);
+    return {
+      id: entity.id,
+      client: { id: existingClient.id, name: existingClient.name },
+      zone: existingZone,
     };
   }
 }
