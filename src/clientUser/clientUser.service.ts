@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ExistingResourceException } from '../shared/errors/existingResource.exception';
-import { MissingResourceException } from '../shared/errors/missingResource.exception';
+import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { ClientUserEntity } from './clientUser.entity';
 import { ClientUserDto } from './interfaces/clientUser.dto';
-import { ClientUserData } from './interfaces/clientUser.response';
+import { ClientUserEntry } from './interfaces/clientUser.response';
 
 @Injectable()
 export class ClientUserService {
@@ -14,7 +14,7 @@ export class ClientUserService {
     private readonly clientUserRepository: Repository<ClientUserEntity>,
   ) {}
 
-  async getById(id: string): Promise<ClientUserData> {
+  async getById(id: string): Promise<ClientUserEntry> {
     const user = await this.clientUserRepository.findOne({
       where: { id },
       relations: ['employer'],
@@ -25,7 +25,7 @@ export class ClientUserService {
     return this.buildResponse(user);
   }
 
-  async update(id: string, dto: ClientUserDto): Promise<ClientUserData> {
+  async update(id: string, dto: ClientUserDto): Promise<ClientUserEntry> {
     const user = await this.clientUserRepository.findOne({
       where: { id },
       relations: ['employer'],
@@ -56,7 +56,7 @@ export class ClientUserService {
     return;
   }
 
-  private buildResponse(entity: ClientUserEntity): ClientUserData {
+  private buildResponse(entity: ClientUserEntity): ClientUserEntry {
     return {
       id: entity.id,
       email: entity.email,

@@ -9,15 +9,14 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
-import { ClientUserData } from '@app/clientUser/interfaces/clientUser.response';
+import { ClientUserEntry } from '@app/clientUser/interfaces/clientUser.response';
 import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
 import { ClientService } from './client.service';
 import { ClientDto } from './interfaces/client.dto';
-import {
-  ClientData,
-  ClientResponse,
-  SingleClientData,
-} from './interfaces/client.response';
+import { ClientEntry, ClientResponse } from './interfaces/client.response';
+import { UuidParam } from '@app/shared/decorators/uuid.param';
+import { ZoneDto } from '@app/zone/interfaces/zone.dto';
+import { ZoneEntry } from '@app/zone/interfaces/zone.response';
 
 @Controller('clients')
 export class ClientController {
@@ -32,7 +31,7 @@ export class ClientController {
   @UsePipes(new ApiValidationPipe())
   async createClient(
     @Body('client') clientDto: ClientDto,
-  ): Promise<ClientData> {
+  ): Promise<ClientEntry> {
     return await this.clientService.createClient(clientDto);
   }
 
@@ -41,7 +40,7 @@ export class ClientController {
   async updateClient(
     @Body('client') clientDto: ClientDto,
     @Param('id') clientId: string,
-  ): Promise<ClientData> {
+  ): Promise<ClientEntry> {
     return await this.clientService.updateClient(clientId, clientDto);
   }
 
@@ -56,15 +55,22 @@ export class ClientController {
   async createClientUser(
     @Body('clientUser') dto: ClientUserDto,
     @Param('id') clientId: string,
-  ): Promise<ClientUserData> {
-    return this.clientService.addUserToClient(dto, clientId);
+  ): Promise<ClientUserEntry> {
+    return await this.clientService.addUserToClient(dto, clientId);
   }
 
   @Get(':id')
   @UsePipes(new ApiValidationPipe())
-  async getClientById(
-    @Param('id') clientId: string,
-  ): Promise<SingleClientData> {
-    return this.clientService.getById(clientId);
+  async getClientById(@Param('id') clientId: string): Promise<ClientEntry> {
+    return await this.clientService.getById(clientId);
+  }
+
+  @Post(':id/zones')
+  @UsePipes(new ApiValidationPipe())
+  async createZone(
+    @UuidParam() clientId: string,
+    @Body('zone') dto: ZoneDto,
+  ): Promise<ZoneEntry> {
+    return await this.clientService.createZone(clientId, dto);
   }
 }

@@ -1,21 +1,14 @@
+import { ClientUserEntry } from '@app/clientUser/interfaces/clientUser.response';
+import { ZoneEntry } from '@app/zone/interfaces/zone.response';
+
 export interface ClientResponse {
   count: number;
-  data: ClientData[];
+  data: ClientEntry[];
 }
 
-interface Employee {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-export interface ClientData {
+export interface ClientEntry {
   id: string;
   name: string;
-}
-
-export interface SingleClientData extends ClientData {
-  employees: Employee[];
-  // TODO employees, zones, machines
+  employees?: ClientUserEntry[];
+  zones?: ZoneEntry[];
 }

@@ -3,10 +3,10 @@ interface Employer {
   name: string;
 }
 
-export interface ClientUserData {
+export interface ClientUserEntry {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  employer: Employer;
+  employer?: Employer;
 }

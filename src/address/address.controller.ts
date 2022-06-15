@@ -1,16 +1,16 @@
 import { UuidParam } from '@app/shared/decorators/uuid.param';
 import { Body, Controller, Delete, Get, Put, UsePipes } from '@nestjs/common';
-import { ApiValidationPipe } from '../shared/pipes/apiValidation.pipe';
+import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
 import { AddressService } from './address.service';
 import { AddressDto } from './interfaces/address.dto';
-import { AddressData } from './interfaces/address.response';
+import { AddressEntry } from './interfaces/address.response';
 
 @Controller('addresses')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   @Get(':id')
-  async getById(@UuidParam() id: string): Promise<AddressData> {
+  async getById(@UuidParam() id: string): Promise<AddressEntry> {
     return await this.addressService.getById(id);
   }
 
@@ -24,7 +24,7 @@ export class AddressController {
   async updateAddress(
     @UuidParam() id: string,
     @Body('address') dto: AddressDto,
-  ): Promise<AddressData> {
+  ): Promise<AddressEntry> {
     return await this.addressService.updateAddress(id, dto);
   }
 }

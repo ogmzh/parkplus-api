@@ -7,11 +7,11 @@ import {
   Put,
   UsePipes,
 } from '@nestjs/common';
-import { UuidParam } from '../shared/decorators/uuid.param';
-import { ApiValidationPipe } from '../shared/pipes/apiValidation.pipe';
+import { UuidParam } from '@app/shared/decorators/uuid.param';
+import { ApiValidationPipe } from '@app/shared/pipes/apiValidation.pipe';
 import { ClientUserService } from './clientUser.service';
 import { ClientUserDto } from './interfaces/clientUser.dto';
-import { ClientUserData } from './interfaces/clientUser.response';
+import { ClientUserEntry } from './interfaces/clientUser.response';
 
 @Controller('clientUsers')
 export class ClientUserController {
@@ -19,7 +19,7 @@ export class ClientUserController {
 
   @Get(':id')
   @UsePipes(new ApiValidationPipe())
-  async getById(@Param('id') id: string): Promise<ClientUserData> {
+  async getById(@Param('id') id: string): Promise<ClientUserEntry> {
     return await this.clientUserService.getById(id);
   }
 
@@ -30,7 +30,7 @@ export class ClientUserController {
   async updateUser(
     @Param('id') id: string,
     @Body('clientUser') dto: ClientUserDto,
-  ): Promise<ClientUserData> {
+  ): Promise<ClientUserEntry> {
     return await this.clientUserService.update(id, dto);
   }
 

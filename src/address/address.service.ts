@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddressEntity } from './address.entity';
 import { AddressDto } from './interfaces/address.dto';
-import { AddressData } from './interfaces/address.response';
+import { AddressEntry } from './interfaces/address.response';
 
 @Injectable()
 export class AddressService {
@@ -13,7 +13,7 @@ export class AddressService {
     private readonly addressRepository: Repository<AddressEntity>,
   ) {}
 
-  async getById(id: string): Promise<AddressData> {
+  async getById(id: string): Promise<AddressEntry> {
     const entity = await this.addressRepository.findOne({
       where: { id },
       relations: ['cities'],
@@ -38,7 +38,7 @@ export class AddressService {
     return;
   }
 
-  async updateAddress(id: string, dto: AddressDto): Promise<AddressData> {
+  async updateAddress(id: string, dto: AddressDto): Promise<AddressEntry> {
     const entity = await this.addressRepository.findOneBy({ id });
     if (!entity) {
       throw new MissingResourceException('id', id);

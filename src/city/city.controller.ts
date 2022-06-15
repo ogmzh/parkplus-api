@@ -9,11 +9,11 @@ import {
   Put,
   UsePipes,
 } from '@nestjs/common';
-import { AddressDto } from '../address/interfaces/address.dto';
-import { AddressData } from '../address/interfaces/address.response';
+import { AddressDto } from '@app/address/interfaces/address.dto';
+import { AddressEntry } from '@app/address/interfaces/address.response';
 import { CityService } from './city.service';
 import { CityDto } from './interfaces/city.dto';
-import { CityData, CityResponse } from './interfaces/city.response';
+import { CityEntry, CityResponse } from './interfaces/city.response';
 
 @Controller('cities')
 export class CityController {
@@ -25,13 +25,13 @@ export class CityController {
   }
 
   @Get(':id')
-  async getById(@UuidParam() id: string): Promise<CityData> {
+  async getById(@UuidParam() id: string): Promise<CityEntry> {
     return await this.cityService.getById(id);
   }
 
   @Post()
   @UsePipes(new ApiValidationPipe())
-  async create(@Body('city') city: CityDto): Promise<CityData> {
+  async create(@Body('city') city: CityDto): Promise<CityEntry> {
     return await this.cityService.save(city);
   }
 
@@ -40,7 +40,7 @@ export class CityController {
   async update(
     @UuidParam() id: string,
     @Body('city') city: CityDto,
-  ): Promise<CityData> {
+  ): Promise<CityEntry> {
     return await this.cityService.update(id, city);
   }
 
@@ -54,7 +54,7 @@ export class CityController {
   async addAddressToCity(
     @UuidParam() id: string,
     @Body('address') dto: AddressDto,
-  ): Promise<AddressData> {
+  ): Promise<AddressEntry> {
     return await this.cityService.createAddressInCity(id, dto);
   }
 }

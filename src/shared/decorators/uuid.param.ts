@@ -4,7 +4,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { isValidUUID } from '../utils/utils';
+import { isValidUUID } from '@app/shared/utils/utils';
 
 export const UuidParam = createParamDecorator(
   (_: any, ctx: ExecutionContext) => {

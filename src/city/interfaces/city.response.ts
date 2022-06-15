@@ -1,12 +1,13 @@
-import { AddressData } from '@app/address/interfaces/address.response';
+import { AddressEntry } from '@app/address/interfaces/address.response';
 
-export interface CityData {
+export interface CityEntry {
   id: string;
   name: string;
-  addresses?: AddressData[];
+  addresses?: AddressEntry[];
+  // TODO zones
 }
 
 export interface CityResponse {
-  data: CityData[];
+  data: CityEntry[];
   count: number;
 }

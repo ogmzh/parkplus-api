@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
-import { isValidUUID } from '../utils/utils';
+import { isValidUUID } from '@app/shared/utils/utils';
 
 @Injectable()
 export class ApiValidationPipe implements PipeTransform {

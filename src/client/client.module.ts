@@ -4,9 +4,12 @@ import { ClientUserEntity } from '@app/clientUser/clientUser.entity';
 import { ClientController } from './client.controller';
 import { ClientEntity } from './client.entity';
 import { ClientService } from './client.service';
+import { ZoneEntity } from '../zone/zone.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ClientEntity, ClientUserEntity])],
+  imports: [
+    TypeOrmModule.forFeature([ClientEntity, ClientUserEntity, ZoneEntity]),
+  ],
   controllers: [ClientController],
   providers: [ClientService],
 })

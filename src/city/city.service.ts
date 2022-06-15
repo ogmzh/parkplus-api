@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddressEntity } from '../address/address.entity';
-import { AddressDto } from '../address/interfaces/address.dto';
-import { AddressData } from '../address/interfaces/address.response';
-import { ExistingResourceException } from '../shared/errors/existingResource.exception';
-import { MissingResourceException } from '../shared/errors/missingResource.exception';
+import { AddressEntity } from '@app/address/address.entity';
+import { AddressDto } from '@app/address/interfaces/address.dto';
+import { AddressEntry } from '@app/address/interfaces/address.response';
+import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { CityEntity } from './city.entity';
 import { CityDto } from './interfaces/city.dto';
-import { CityData, CityResponse } from './interfaces/city.response';
+import { CityEntry, CityResponse } from './interfaces/city.response';
 
 @Injectable()
 export class CityService {
@@ -24,7 +24,7 @@ export class CityService {
     return { data: cities, count };
   }
 
-  async getById(id: string): Promise<CityData> {
+  async getById(id: string): Promise<CityEntry> {
     const existingCity = await this.cityRepository.findOne({
       where: { id },
       relations: ['addresses'],
@@ -44,11 +44,11 @@ export class CityService {
     };
   }
 
-  async save(dto: CityDto): Promise<CityData> {
+  async save(dto: CityDto): Promise<CityEntry> {
     return await this.cityRepository.save({ ...dto });
   }
 
-  async update(id: string, dto: CityDto): Promise<CityData> {
+  async update(id: string, dto: CityDto): Promise<CityEntry> {
     const existingCity = await this.cityRepository.findOneBy({ id });
     if (!existingCity) {
       throw new MissingResourceException('id', id);
@@ -69,7 +69,10 @@ export class CityService {
     await this.cityRepository.delete({ id });
   }
 
-  async createAddressInCity(id: string, dto: AddressDto): Promise<AddressData> {
+  async createAddressInCity(
+    id: string,
+    dto: AddressDto,
+  ): Promise<AddressEntry> {
     const existingCity = await this.cityRepository.findOne({
       where: { id },
     });

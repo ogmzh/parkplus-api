@@ -20,7 +20,7 @@ export class ZoneEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column('decimal', { precision: 2, scale: 0 })
   price: number;
 
   @Column({ name: 'max_park_duration' })
@@ -34,7 +34,7 @@ export class ZoneEntity {
 
   // TODO discuss timeWeekend & timeHoliday
 
-  @ManyToOne(() => ClientEntity, client => client.zones)
+  @ManyToOne(() => ClientEntity, client => client.zones, { nullable: false })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 

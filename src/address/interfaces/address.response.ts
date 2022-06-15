@@ -1,8 +1,8 @@
-import { CityData } from '../../city/interfaces/city.response';
+import { CityEntry } from '@app/city/interfaces/city.response';
 
-export interface AddressData {
+export interface AddressEntry {
   id: string;
   name: string;
   number: string;
-  cities?: CityData[];
+  cities?: CityEntry[];
 }

@@ -1,14 +1,17 @@
 import { ClientUserEntity } from '@app/clientUser/clientUser.entity';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
-import { ClientUserData } from '@app/clientUser/interfaces/clientUser.response';
+import { ClientUserEntry } from '@app/clientUser/interfaces/clientUser.response';
 import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
 import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { ClientEntity } from './client.entity';
 import { ClientDto } from './interfaces/client.dto';
-import { ClientData, SingleClientData } from './interfaces/client.response';
+import { ClientEntry } from './interfaces/client.response';
+import { ZoneDto } from '@app/zone/interfaces/zone.dto';
+import { ZoneEntity } from '@app/zone/zone.entity';
+import { ZoneEntry } from '@app/zone/interfaces/zone.response';
 
 @Injectable()
 export class ClientService {
@@ -17,9 +20,11 @@ export class ClientService {
     private readonly clientRepository: Repository<ClientEntity>,
     @InjectRepository(ClientUserEntity)
     private readonly clientUserRepository: Repository<ClientUserEntity>,
+    @InjectRepository(ZoneEntity)
+    private readonly zoneRepository: Repository<ZoneEntity>,
   ) {}
 
-  async getAll(): Promise<{ count: number; data: ClientData[] }> {
+  async getAll(): Promise<{ count: number; data: ClientEntry[] }> {
     const [data, count] = await this.clientRepository.findAndCount();
 
     return {
@@ -28,7 +33,7 @@ export class ClientService {
     };
   }
 
-  async createClient(clientDto: ClientDto): Promise<ClientData> {
+  async createClient(clientDto: ClientDto): Promise<ClientEntry> {
     const existing =
       (await this.clientRepository.countBy({ name: clientDto.name })) > 0;
     if (existing) {
@@ -40,7 +45,7 @@ export class ClientService {
     return { id: newEntry.id, name: newEntry.name };
   }
 
-  async updateClient(id: string, clientDto: ClientDto): Promise<ClientData> {
+  async updateClient(id: string, clientDto: ClientDto): Promise<ClientEntry> {
     const clientEntity = await this.clientRepository.findOne({
       where: { id },
     });
@@ -66,7 +71,7 @@ export class ClientService {
   async addUserToClient(
     dto: ClientUserDto,
     clientId: string,
-  ): Promise<ClientUserData> {
+  ): Promise<ClientUserEntry> {
     const existingEmail =
       (await this.clientUserRepository.countBy({
         email: dto.email,
@@ -99,10 +104,10 @@ export class ClientService {
     };
   }
 
-  async getById(clientId: string): Promise<SingleClientData> {
+  async getById(clientId: string): Promise<ClientEntry> {
     const client = await this.clientRepository.findOne({
       where: { id: clientId },
-      relations: ['employees'],
+      relations: ['employees', 'zones'],
     });
     if (!client) {
       throw new MissingResourceException('id', clientId);
@@ -110,12 +115,44 @@ export class ClientService {
     return {
       id: client.id,
       name: client.name,
+      zones: client.zones,
       employees: client.employees.map(employee => ({
         id: employee.id,
         email: employee.email,
         firstName: employee.firstName,
         lastName: employee.lastName,
       })),
+    };
+  }
+
+  async createZone(clientId: string, dto: ZoneDto): Promise<ZoneEntry> {
+    const client = await this.clientRepository.findOne({
+      where: { id: clientId },
+      relations: ['zones'],
+    });
+    if (!client) {
+      throw new MissingResourceException('id', clientId);
+    }
+
+    if (client.zones.some(zone => zone.name === dto.name)) {
+      throw new ExistingResourceException(
+        'name',
+        dto.name,
+        'existing zone name',
+      );
+    }
+
+    const zone = new ZoneEntity();
+    Object.assign(zone, dto);
+    zone.client = client;
+    const persisted = await this.zoneRepository.save(zone);
+    return {
+      id: persisted.id,
+      name: persisted.name,
+      price: persisted.price,
+      maxParkDuration: persisted.maxParkDuration,
+      parkTimeStart: persisted.parkTimeStart,
+      parkTimeEnd: persisted.parkTimeEnd,
     };
   }
 }

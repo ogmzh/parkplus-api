@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { CityEntity } from '../city/city.entity';
+import { CityEntity } from '@app/city/city.entity';
 
 @Entity({ name: 'addresses' })
 export class AddressEntity {
