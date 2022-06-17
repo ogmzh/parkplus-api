@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
@@ -15,7 +16,7 @@ export class TicketEntity {
   @Column({ name: 'license_plate' })
   licensePlate: string;
 
-  @Column({ type: 'timestamptz', name: 'issued_at', default: new Date() })
+  @Column({ type: 'timestamptz', name: 'issued_at' })
   issuedAt: Date;
 
   @Column({ type: 'timestamptz', name: 'expires_at' })
@@ -24,6 +25,11 @@ export class TicketEntity {
   @ManyToOne(() => ZoneEntity, zone => zone.tickets)
   @JoinColumn({ name: 'zone_id' })
   zone: ZoneEntity;
+
+  @BeforeInsert()
+  private setDate() {
+    this.issuedAt = new Date();
+  }
 
   //   @ManyToOne(()) todo implement TVM relation
 }

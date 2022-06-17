@@ -69,7 +69,6 @@ export class ClientService {
       throw new MissingResourceException('id', clientId);
     }
     await this.clientRepository.delete({ id: clientId });
-    return;
   }
 
   async addUserToClient(

@@ -5,7 +5,7 @@ import { ClientUserService } from './clientUser.service';
 import { ClientUserDto } from './interfaces/clientUser.dto';
 import { ClientUserEntry } from './interfaces/clientUser.response';
 
-@Controller('clientUsers')
+@Controller('client-users')
 export class ClientUserController {
   constructor(private readonly clientUserService: ClientUserService) {}
 

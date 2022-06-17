@@ -20,7 +20,7 @@ export class ZoneEntity {
   @Column()
   name: string;
 
-  @Column('decimal', { precision: 2, scale: 0 })
+  @Column('decimal', { precision: 12, scale: 2 })
   price: number;
 
   @Column({ name: 'max_park_duration' })

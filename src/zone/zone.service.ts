@@ -40,6 +40,5 @@ export class ZoneService {
     }
 
     await this.zoneRepository.delete({ id });
-    return;
   }
 }

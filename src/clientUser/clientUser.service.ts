@@ -53,7 +53,6 @@ export class ClientUserService {
       throw new MissingResourceException('id', id);
     }
     await this.clientUserRepository.delete({ id });
-    return;
   }
 
   private buildResponse(entity: ClientUserEntity): ClientUserEntry {

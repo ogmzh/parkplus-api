@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
@@ -15,10 +16,15 @@ export class ParkingMachineLogEntity {
   @Column({ type: 'timestamptz', name: 'taken_at' })
   takenAt: Date;
 
-  @Column()
+  @Column('decimal', { precision: 12, scale: 2 })
   temperature: number;
 
   @ManyToOne(() => ParkingMachineEntity, machine => machine.logs)
   @JoinColumn({ name: 'machine_id' })
   machine: ParkingMachineEntity;
+
+  @BeforeInsert()
+  private setDate() {
+    this.takenAt = new Date();
+  }
 }

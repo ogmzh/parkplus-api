@@ -35,7 +35,6 @@ export class AddressService {
       throw new MissingResourceException('id', id);
     }
     await this.addressRepository.delete({ id });
-    return;
   }
 
   async updateAddress(id: string, dto: AddressDto): Promise<AddressEntry> {

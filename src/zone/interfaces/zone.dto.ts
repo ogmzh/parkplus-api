@@ -1,8 +1,10 @@
 import {
   IsMilitaryTime,
   IsNotEmpty,
+  IsNumber,
   IsPositive,
   Length,
+  Max,
 } from 'class-validator';
 
 export class ZoneDto {
@@ -12,6 +14,8 @@ export class ZoneDto {
 
   @IsNotEmpty()
   @IsPositive()
+  @IsNumber({ maxDecimalPlaces: 2, allowInfinity: false, allowNaN: false })
+  @Max(9999999999.99)
   price: number;
 
   @IsNotEmpty()

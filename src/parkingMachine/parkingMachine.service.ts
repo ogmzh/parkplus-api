@@ -1,18 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MissingResourceException } from '../shared/errors/missingResource.exception';
+import { ParkingMachineLogDto } from '@app/parkingMachineLog/interfaces/parkingMachineLog.dto';
+import {
+  ParkingMachineLogEntry,
+  ParkingMachineLogResponse,
+} from '@app/parkingMachineLog/interfaces/parkingMachineLog.response';
+import { ParkingMachineLogEntity } from '@app/parkingMachineLog/parkingMachineLog.entity';
+import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import {
   ParkingMachineEntry,
   ParkingMachineResponse,
 } from './interfaces/parkingMachine.interface';
 import { ParkingMachineEntity } from './parkingMachine.entity';
+import { formatISO } from 'date-fns';
 
 @Injectable()
 export class ParkingMachineService {
   constructor(
     @InjectRepository(ParkingMachineEntity)
     private readonly parkingMachineRepository: Repository<ParkingMachineEntity>,
+    @InjectRepository(ParkingMachineLogEntity)
+    private readonly parkingMachineLogRepository: Repository<ParkingMachineLogEntity>,
   ) {}
 
   async getAll(): Promise<ParkingMachineResponse> {
@@ -39,6 +48,49 @@ export class ParkingMachineService {
     }
 
     await this.parkingMachineRepository.delete({ id });
-    return;
+  }
+
+  async createLog(
+    id: string,
+    log: ParkingMachineLogDto,
+  ): Promise<ParkingMachineLogEntry> {
+    const existingMachine = await this.parkingMachineRepository.findOneBy({
+      id,
+    });
+    if (!existingMachine) {
+      throw new MissingResourceException('id', id);
+    }
+    const logEntity = new ParkingMachineLogEntity();
+    Object.assign(logEntity, log);
+    logEntity.machine = existingMachine;
+    const savedEntity = await this.parkingMachineLogRepository.save(logEntity);
+    return {
+      id: savedEntity.id,
+      takenAt: formatISO(savedEntity.takenAt),
+      temperature: savedEntity.temperature,
+      machine: existingMachine,
+    };
+  }
+
+  async getLogs(id: string): Promise<ParkingMachineLogResponse> {
+    const existingMachine =
+      (await this.parkingMachineRepository.countBy({ id })) > 0;
+    if (!existingMachine) {
+      throw new MissingResourceException('id', id);
+    }
+
+    const [data, count] = await this.parkingMachineLogRepository.findAndCount({
+      where: { machine: { id } },
+      order: { takenAt: 'DESC' },
+    });
+
+    return {
+      count,
+      data: data.map(log => ({
+        id: log.id,
+        temperature: log.temperature,
+        takenAt: formatISO(log.takenAt),
+      })),
+    };
   }
 }
