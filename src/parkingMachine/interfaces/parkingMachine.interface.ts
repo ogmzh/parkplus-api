@@ -1,11 +1,12 @@
 import { ClientEntry } from '@app/client/interfaces/client.response';
 import { ZoneEntry } from '@app/zone/interfaces/zone.response';
+import { ParkingMachineLogEntry } from '../../parkingMachineLog/interfaces/parkingMachineLog.response';
 
 export interface ParkingMachineEntry {
   id: string;
   client: ClientEntry;
   zone: ZoneEntry;
-  // TODO logs
+  logs: ParkingMachineLogEntry[];
 }
 
 export interface ParkingMachineResponse {

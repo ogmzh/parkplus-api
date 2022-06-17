@@ -26,18 +26,21 @@ export class ParkingMachineService {
 
   async getAll(): Promise<ParkingMachineResponse> {
     const [data, count] = await this.parkingMachineRepository.findAndCount();
-    return { data, count };
+    return {
+      data: data.map(entry => prepareParkingMachineResponseEntry(entry)),
+      count,
+    };
   }
 
   async getById(id: string): Promise<ParkingMachineEntry> {
     const entity = await this.parkingMachineRepository.findOne({
       where: { id },
-      relations: ['zone', 'client'],
+      relations: ['zone', 'client', 'logs'],
     });
     if (!entity) {
       throw new MissingResourceException('id', id);
     }
-    return entity;
+    return prepareParkingMachineResponseEntry(entity);
   }
 
   async deleteMachine(id: string): Promise<void> {
@@ -68,7 +71,7 @@ export class ParkingMachineService {
       id: savedEntity.id,
       takenAt: formatISO(savedEntity.takenAt),
       temperature: savedEntity.temperature,
-      machine: existingMachine,
+      machine: prepareParkingMachineResponseEntry(existingMachine),
     };
   }
 
@@ -94,3 +97,17 @@ export class ParkingMachineService {
     };
   }
 }
+const prepareParkingMachineResponseEntry = (
+  entry: ParkingMachineEntity,
+): ParkingMachineEntry => {
+  return {
+    id: entry.id,
+    zone: entry.zone,
+    client: entry.client,
+    logs: entry.logs.map(logEntry => ({
+      id: logEntry.id,
+      temperature: logEntry.temperature,
+      takenAt: formatISO(logEntry.takenAt),
+    })),
+  };
+};

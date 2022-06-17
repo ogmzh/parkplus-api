@@ -191,6 +191,7 @@ export class ClientService {
     return {
       id: entity.id,
       client: { id: existingClient.id, name: existingClient.name },
+      logs: [],
       zone: existingZone,
     };
   }

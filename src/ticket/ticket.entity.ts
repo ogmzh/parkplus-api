@@ -27,9 +27,9 @@ export class TicketEntity {
   zone: ZoneEntity;
 
   @BeforeInsert()
-  private setDate() {
+  setDate() {
     this.issuedAt = new Date();
   }
 
-  //   @ManyToOne(()) todo implement TVM relation
+  //   TODO should issuing a ticket have a relation to a machine which issued the ticket?
 }
