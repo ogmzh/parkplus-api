@@ -72,6 +72,8 @@ export class ZoneService {
       );
     }
 
+    // TODO check if the time expiring is longer than the zone's max parking time
+
     const newTicket = new TicketEntity();
     newTicket.expiresAt = new Date(dto.expiresAt);
     newTicket.zone = zone;

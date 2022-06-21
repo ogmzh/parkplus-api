@@ -1,9 +1,17 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, Length } from 'class-validator';
 
 export class AddressDto {
+  @ApiProperty({ example: 'Cara Dušana', required: true })
   @IsNotEmpty()
   @Length(3, 60)
-  name: string;
+  readonly name: string;
 
-  number: string;
+  @ApiProperty({ example: '10', required: false })
+  readonly number: string;
+}
+
+export class RequestBodyAddressDto {
+  @ApiProperty()
+  readonly address: AddressDto;
 }

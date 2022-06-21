@@ -1,3 +1,4 @@
+import { AddressEntity } from '@app/address/address.entity';
 import {
   Column,
   Entity,
@@ -5,7 +6,6 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { AddressEntity } from '@app/address/address.entity';
 
 @Entity({ name: 'cities' })
 export class CityEntity {
