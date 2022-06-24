@@ -53,9 +53,8 @@ Park Plus REST API built using [Nest](https://github.com/nestjs/nest) framework 
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
+- Author - [Ognjen Mišić](https://github.com/zhGio)
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
-Underlying dependencies are [MIT licensed](LICENSE).
+Nest and the underlying dependencies are [MIT licensed](LICENSE).
