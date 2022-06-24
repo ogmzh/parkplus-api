@@ -1,0 +1,26 @@
+version: '3.2'
+
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: 'Dockerfile'
+    ports:
+      - '5010:5010'
+    depends_on:
+      - db
+    container_name: park-plus-api
+  db:
+    image: postgres
+    restart: always
+    container_name: park-plus-db
+    environment:
+      POSTGRES_USER: parkplusadmin
+      POSTGRES_PASSWORD: parkplusadmin
+      POSTGRES_DB: parkplusdb
+    ports:
+      - '5431:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+volumes:
+  pg_data:
