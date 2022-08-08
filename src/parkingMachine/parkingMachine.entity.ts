@@ -8,6 +8,7 @@ import {
 import { ClientEntity } from '@app/client/client.entity';
 import { ParkingMachineLogEntity } from '@app/parkingMachineLog/parkingMachineLog.entity';
 import { ZoneEntity } from '@app/zone/zone.entity';
+import { TicketEntity } from '../ticket/ticket.entity';
 
 @Entity({ name: 'parking_machines' })
 export class ParkingMachineEntity {
@@ -30,4 +31,7 @@ export class ParkingMachineEntity {
 
   @OneToMany(() => ParkingMachineLogEntity, log => log.machine)
   logs: ParkingMachineLogEntity[];
+
+  @OneToMany(() => TicketEntity, ticket => ticket.machine)
+  tickets: TicketEntity[];
 }
