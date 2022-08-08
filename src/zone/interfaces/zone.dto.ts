@@ -35,6 +35,10 @@ export class ZoneDto {
   @IsMilitaryTime()
   @IsNotEmpty()
   readonly parkTimeEnd: string;
+
+  @ApiProperty({ example: 14, required: true })
+  @IsPositive()
+  readonly maxParkingSpots: number;
 }
 
 export class RequestBodyZoneDto {

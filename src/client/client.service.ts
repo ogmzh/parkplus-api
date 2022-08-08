@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientUserDto } from '@app/clientUser/interfaces/clientUser.dto';
 import { ClientUserEntry } from '@app/clientUser/interfaces/clientUser.response';
-import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { ConflictingResourceException } from '@app/shared/errors/existingResource.exception';
 import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { ClientEntity } from './client.entity';
 import { ClientDto } from './interfaces/client.dto';
@@ -41,7 +41,7 @@ export class ClientService {
     const existing =
       (await this.clientRepository.countBy({ name: clientDto.name })) > 0;
     if (existing) {
-      throw new ExistingResourceException('name', clientDto.name);
+      throw new ConflictingResourceException('name', clientDto.name);
     }
     const clientEntity = new ClientEntity();
     Object.assign(clientEntity, clientDto);
@@ -81,7 +81,7 @@ export class ClientService {
       })) > 0;
 
     if (existingEmail) {
-      throw new ExistingResourceException('email', dto.email);
+      throw new ConflictingResourceException('email', dto.email);
     }
     const client = await this.clientRepository.findOne({
       where: { id: clientId },
@@ -138,7 +138,7 @@ export class ClientService {
     }
 
     if (client.zones.some(zone => zone.name === dto.name)) {
-      throw new ExistingResourceException(
+      throw new ConflictingResourceException(
         'name',
         dto.name,
         'existing zone name',
@@ -156,6 +156,7 @@ export class ClientService {
       maxParkDuration: persisted.maxParkDuration,
       parkTimeStart: persisted.parkTimeStart,
       parkTimeEnd: persisted.parkTimeEnd,
+      maxParkingSpots: persisted.maxParkingSpots,
     };
   }
 

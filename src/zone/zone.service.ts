@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, MoreThan, Repository } from 'typeorm';
+import { ConflictingResourceException } from '@app/shared/errors/existingResource.exception';
 import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
-import { ZoneDto } from './interfaces/zone.dto';
-import { ZoneEntry } from './interfaces/zone.response';
-import { ZoneEntity } from './zone.entity';
 import { TicketDto } from '@app/ticket/interfaces/ticket.dto';
-import { TicketEntity } from '@app/ticket/ticket.entity';
 import {
   TicketEntry,
   TicketResponse,
 } from '@app/ticket/interfaces/ticket.response';
-import { formatISO } from 'date-fns';
-import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { TicketEntity } from '@app/ticket/ticket.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { add, formatISO } from 'date-fns';
+import { MoreThan, Repository } from 'typeorm';
+import { ZoneDto } from './interfaces/zone.dto';
+import { ZoneEntry } from './interfaces/zone.response';
+import { ZoneEntity } from './zone.entity';
 
 @Injectable()
 export class ZoneService {
@@ -58,24 +58,34 @@ export class ZoneService {
       throw new MissingResourceException('id', id, 'non existing zone');
     }
 
-    const activeTicket =
-      (await this.ticketRepository.countBy({
-        licensePlate: dto.licensePlate,
+    const [activeTickets, numberOfActiveTickets] =
+      await this.ticketRepository.findAndCountBy({
+        zone: { id: zone.id },
         expiresAt: MoreThan(new Date()),
-      })) > 0;
+      });
+
+    const activeTicket = activeTickets.find(
+      ticket => ticket.licensePlate === dto.licensePlate,
+    );
 
     if (activeTicket) {
-      throw new ExistingResourceException(
+      throw new ConflictingResourceException(
         'licensePlate',
         dto.licensePlate,
         'Non expired ticket for license plate',
       );
     }
 
-    // TODO check if the time expiring is longer than the zone's max parking time
+    if (numberOfActiveTickets >= zone.maxParkingSpots) {
+      throw new ConflictingResourceException(
+        'licensePlate',
+        dto.licensePlate,
+        'No free spots available in zone',
+      );
+    }
 
     const newTicket = new TicketEntity();
-    newTicket.expiresAt = new Date(dto.expiresAt);
+    newTicket.expiresAt = add(new Date(), { hours: 1 });
     newTicket.zone = zone;
     newTicket.licensePlate = dto.licensePlate;
 

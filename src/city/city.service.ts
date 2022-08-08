@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { AddressEntity } from '@app/address/address.entity';
 import { AddressDto } from '@app/address/interfaces/address.dto';
 import { AddressEntry } from '@app/address/interfaces/address.response';
-import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { ConflictingResourceException } from '@app/shared/errors/existingResource.exception';
 import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { CityEntity } from './city.entity';
 import { CityDto } from './interfaces/city.dto';
@@ -90,7 +90,7 @@ export class CityService {
         city => city.id === id,
       );
       if (addressCityAlreadyAdded) {
-        throw new ExistingResourceException(
+        throw new ConflictingResourceException(
           'id',
           id,
           'This address already belongs in this city',

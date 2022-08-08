@@ -32,7 +32,8 @@ export class ZoneEntity {
   @Column({ name: 'park_time_end', type: 'time' })
   parkTimeEnd: string;
 
-  // TODO discuss timeWeekend & timeHoliday
+  @Column({ name: 'max_parking_spots' })
+  maxParkingSpots: number;
 
   @ManyToOne(() => ClientEntity, client => client.zones, { nullable: false })
   @JoinColumn({ name: 'client_id' })

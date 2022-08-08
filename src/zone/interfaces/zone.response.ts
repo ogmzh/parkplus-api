@@ -13,6 +13,8 @@ export class ZoneEntry {
   parkTimeStart: string;
   @ApiProperty({ example: '23:00' })
   parkTimeEnd: string;
+  @ApiProperty({ example: 12 })
+  maxParkingSpots: number;
 }
 
 export class ZoneResponse {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ExistingResourceException } from '@app/shared/errors/existingResource.exception';
+import { ConflictingResourceException } from '@app/shared/errors/existingResource.exception';
 import { MissingResourceException } from '@app/shared/errors/missingResource.exception';
 import { ClientUserEntity } from './clientUser.entity';
 import { ClientUserDto } from './interfaces/clientUser.dto';
@@ -38,7 +38,7 @@ export class ClientUserService {
       const existingEmail =
         (await this.clientUserRepository.countBy({ email: dto.email })) > 0;
       if (existingEmail) {
-        throw new ExistingResourceException('email', user.email);
+        throw new ConflictingResourceException('email', user.email);
       }
     }
 

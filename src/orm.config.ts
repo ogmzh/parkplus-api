@@ -1,8 +1,14 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 const config: DataSourceOptions = {
-  host: 'db',
-  port: 5432,
+  // use for docker
+  // host: 'db',
+  // port: 5432,
+
+  // use for local
+  host: 'localhost',
+  port: 5431,
+
   username: 'parkplusadmin',
   password: 'parkplusadmin',
   type: 'postgres',
