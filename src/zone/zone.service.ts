@@ -53,9 +53,21 @@ export class ZoneService {
   }
 
   async createTicket(id: string, dto: TicketDto): Promise<TicketEntry> {
-    const zone = await this.zoneRepository.findOneBy({ id });
+    const zone = await this.zoneRepository.findOne({
+      where: { id },
+      relations: ['machines'],
+    });
+
     if (!zone) {
       throw new MissingResourceException('id', id, 'non existing zone');
+    }
+
+    if (!zone.machines.some(machine => machine.id === dto.parkingMachineId)) {
+      throw new MissingResourceException(
+        'parkingMachineId',
+        dto.parkingMachineId,
+        'non existing parking machine',
+      );
     }
 
     const [activeTickets, numberOfActiveTickets] =
@@ -88,6 +100,9 @@ export class ZoneService {
     newTicket.expiresAt = add(new Date(), { hours: 1 });
     newTicket.zone = zone;
     newTicket.licensePlate = dto.licensePlate;
+    newTicket.machine = zone.machines.find(
+      machine => machine.id === dto.parkingMachineId,
+    );
 
     const entity = await this.ticketRepository.save(newTicket);
     return this.buildTicketResponse(entity);
@@ -104,7 +119,7 @@ export class ZoneService {
         zone: { id },
         expiresAt: MoreThan(new Date()),
       },
-      relations: ['zone'],
+      relations: ['zone', 'machine'],
     });
 
     return {
@@ -120,6 +135,7 @@ export class ZoneService {
       issuedAt: formatISO(entity.issuedAt),
       licensePlate: entity.licensePlate,
       zone: entity.zone,
+      machineId: entity.machine.id,
     };
   }
 }

@@ -16,7 +16,7 @@ export class TicketService {
   async getById(id: string): Promise<TicketEntry> {
     const ticket = await this.ticketRepository.findOne({
       where: { id },
-      relations: ['zone'],
+      relations: ['zone', 'machine'],
     });
     if (!ticket) {
       throw new MissingResourceException('id', id);
@@ -28,6 +28,7 @@ export class TicketService {
       issuedAt: formatISO(ticket.issuedAt),
       licensePlate: ticket.licensePlate,
       zone: ticket.zone,
+      machineId: ticket.machine?.id ?? '',
     };
   }
 

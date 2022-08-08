@@ -9,6 +9,11 @@ export class TicketDto {
   @Length(4, 12)
   readonly licensePlate: string;
 
+  @ApiProperty({ required: true, example: 'J12L123' })
+  @IsNotEmpty()
+  @IsString()
+  readonly parkingMachineId: string;
+
   // @ApiProperty({ example: '2022-07-17T17:34:22+02:00', required: true })
   // @IsNotEmpty()
   // @IsDate()

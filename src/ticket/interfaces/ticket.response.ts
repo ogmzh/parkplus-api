@@ -1,5 +1,6 @@
 import { ZoneEntry } from '@app/zone/interfaces/zone.response';
 import { ApiProperty } from '@nestjs/swagger';
+import { ParkingMachineEntry } from '../../parkingMachine/interfaces/parkingMachine.interface';
 
 export class TicketEntry {
   @ApiProperty({ example: 'uuid-uuid-uuid-uuid' })
@@ -14,6 +15,8 @@ export class TicketEntry {
     type: ZoneEntry,
   })
   zone: ZoneEntry;
+  @ApiProperty({ example: '1234abcd' })
+  machineId: string;
 }
 
 export class TicketResponse {
